@@ -22,12 +22,13 @@ class ElasticHelper:
             verify_certs=False
         )
 
-    def _doc_generator(self, index_name: str, df: pd.DataFrame):
+    def _doc_generator(self, index_name: str, df: pd.DataFrame, doc_id: str):
         """ This is a generator function that yields a dictionary of the index name, document id, and the document itself.
 
         Args:
             index_name (str): The index to insert the document into.
             df (pd.DataFrame): The dataframe to iterate over.
+            doc_id (str): The name of the column to use as the document id.
 
         Yields:
             dict: A dictionary of the index name, document id, and the document itself.
@@ -36,18 +37,19 @@ class ElasticHelper:
         for index, document in df_iter:
             yield {
                 "_index": index_name,
-                "_id" : f"{document['SNo']}",
+                "_id" : f"{document[doc_id]}",
                 "_source": document.to_dict()
             }
 
-    def bulk_insert(self, index_name: str, df: pd.DataFrame):
+    def bulk_insert(self, index_name: str, df: pd.DataFrame, doc_id: str):
         """This function is used to bulk insert a dataframe into ElasticSearch.
 
         Args:
             index_name (str): The index to insert the document into.
             df (pd.DataFrame): The dataframe to iterate over.
+            doc_id (str): The name of the column to use as the document id.
         """
-        responses = parallel_bulk(self.es, self._doc_generator(index_name, df))
+        responses = parallel_bulk(self.es, self._doc_generator(index_name, df, doc_id))
         for response in responses:
             if response[1]["index"]["status"] != 201:
                 print(response)
@@ -83,3 +85,19 @@ class ElasticHelper:
             return False 
         self.es.indices.delete(index=index_name)
         return True 
+    
+    def index_exists(self, index_name: str) -> bool:
+        """This function is used to check if an index exists in ElasticSearch.
+
+        Args:
+            index_name (str): The name of the index to check.
+
+        Returns:
+            bool: True if the index exists, False if it does not exist.
+        """
+        return self.es.indices.exists(index=index_name)
+    
+if __name__ == "__main__":
+    helper = ElasticHelper()
+    if not helper.index_exists("THIS IS A TEST"):
+        print("Elastic successfully connected.")
