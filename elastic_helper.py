@@ -1,6 +1,6 @@
 import pandas as pd 
 from elasticsearch import Elasticsearch
-from elasticsearch.helpers import bulk, streaming_bulk, parallel_bulk
+from elasticsearch.helpers import parallel_bulk
 from os import getenv
 from dotenv import load_dotenv
 
