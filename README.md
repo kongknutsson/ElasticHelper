@@ -5,8 +5,7 @@ Helper functions to transform and load data to ElasticSearch.
 This project requires a .env file in the following format:
 
 ELASTIC_PASSWORD = 'PASSWORD'
-
 ELASTIC_USERNAME = 'USERNAME'
-
 ELASTIC_CERT = 'CERTIFICATION'
 
+These values can be gotten from the Terminal when creating your elastic search setup for the first time. 
